@@ -76,7 +76,7 @@ code {
 
 .flex-wrapper {
   box-sizing: border-box;
-  min-height: 95%;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
 }
