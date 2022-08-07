@@ -1,0 +1,111 @@
+<script src="https://cdn.bootcss.com/codemirror/5.48.4/codemirror.min.js"></script>
+<script src="https://cdn.bootcss.com/codemirror/5.48.4/mode/clike/clike.min.js"></script>
+<link href="https://cdn.bootcss.com/codemirror/5.48.4/codemirror.min.css" rel="stylesheet">
+<link rel="stylesheet" href="<%= url_for('css/github.css') %>" type="text/css">
+<script src="https://pv.sohu.com/cityjson?ie=utf-8"></script>
+<script>
+	/*
+const postT={
+	type: "POST",
+    dataType   : 'json',
+	contentType: 'application/json; charset=UTF-8', 
+	url: "http://47.98.32.107:233/judge",
+	data: ""
+}
+const contentT={
+	"src" : "",
+	"ip" : returnCitySN["cip"],
+	"problem" : "<%- page.path.split('/')[0] %>"
+}*/
+
+var editor
+
+$(function(){
+	editor = CodeMirror.fromTextArea(document.getElementById("source-code"), {
+		lineNumbers: true,
+		mode: "text/x-csrc",
+		matchBrackets: true,
+		theme: "github-light"
+	});
+})
+
+var timer
+function DoQuery() {
+	$.ajax({
+		type: "POST",
+		dataType   : 'json',
+		contentType: 'application/json; charset=UTF-8', 
+		url: "http://47.98.32.107:233/judge",
+		data: JSON.stringify({
+			"src" : "",
+			"ip" : returnCitySN["cip"],
+			"problem" : "<%- page.path.split('/')[0] %>"
+		}),
+		success : function(result) {
+			//console.log(result)
+			if(result.status!="Pending") {
+				window.clearInterval(timer) 
+				$('#bear-thinking').css("display","none")
+				$('#result-id').css("display","inline")
+			}
+			if(result.status=='Accepted')
+				$('#result-id').text(result.status+" in "+result.time.toFixed(2)+" seconds")
+			else
+				$('#result-id').text(result.status)
+		}
+	})
+
+}
+
+function DoSubmit() {
+	code=editor.doc.getValue();
+	if (code.length!=0) {
+/*		var request=postT,content=contentT
+		content["src"]=code
+		request.data=JSON.stringify(content)
+		console.log(request)
+		$.ajax(request)*/
+		$.ajax({
+			type: "POST",
+			dataType   : 'json',
+			contentType: 'application/json; charset=UTF-8', 
+			url: "https://47.98.32.107:233/judge",
+			data: JSON.stringify({
+				"src" : code,
+				"ip" : returnCitySN["cip"],
+				"problem" : "<%- page.path.split('/')[0] %>"
+			})
+		})
+		$('#submit-button').css("display","none")
+		$('#bear-thinking').css("display","inline")
+		timer=window.setInterval(DoQuery,3000)
+	}
+}
+
+</script>
+<div class="m0 py2">
+	<div class="md-col-12">
+		<div class="overflow-hidden bg-white rounded">
+			<div class="m1 p2 white">
+				<div class="clearfix">
+					<div class="left">
+						<h1 class="h2 m0"><a href="<%- url_for(page.path) %>" class="black">
+						<%- page.title %>
+						</a></h1>
+					</div>
+				</div>
+			</div>
+			<div class="m2 p2 border-top">
+				<%- page.content %>
+			</div>
+			<div class="m2">
+				<textarea class="form-control" id="source-code" name="code"></textarea>
+			</div>
+			<div class="right-align m4">
+				<img src="https://dhxh.pw/wp-content/uploads/2017/02/image.jpeg" id="bear-thinking" style="height:60px;width:60px;float:right;display:none">
+				<span id="result-id" style="display:none"></span>
+				<button class="btn" id="submit-button" onclick="DoSubmit()">Submit</button>
+			</div>
+		</div>
+	</div>
+</div>

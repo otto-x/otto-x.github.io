@@ -1,0 +1,54 @@
+<% var posts=[]; site.posts.forEach(function(item, index) { var year=date(item.date, 'YYYY' ); if (!posts[year]) {
+  posts[year]=[]; } posts[year].push({ 'title' : item.title, 'path' : item.path, 'date' : item.date }) }); %>
+  <div class="mt2 mb2" style="position:relative">
+    <span class="btn button-narrow">Archives</span>
+    <!-- <svg class="icon gray" data-icon="chevron-right"></svg> -->
+    <!-- <i class="fa-solid fa-chevron-right"></i> -->
+    <span class="btn button-narrow">
+      <%= site.posts.length %> posts
+    </span>
+    <span class="local-search local-search-google local-search-plugin" style="position: absolute;right: 0;">
+      <input type="search" placeholder="Search in my world" id="local-search-input" class="local-search-input-cls">
+      <div id="local-search-result" class="local-search-result-cls"></div>
+    </span>
+  </div>
+
+  <div class="mt2 mb2">
+    <!--	<% posts.forEach(function(single, year) { %>
+		<div class="col-12 bg-white rounded mb4">
+			<span class="btn block border-bottom muted"><%- year %> <span class="h6 muted">(<%- posts[year].length %>)</span></span>
+			<% var length = single.length;
+			single.sort(function(a,b) {
+				return a['date'] < b['date'];
+			});	
+			single.forEach(function(item, index) { %>
+			<a href="<%- url_for(item.path) %>" class="btn block<%- (index != length - 1 ? ' border-bottom' : '') %>"><%- item.title %>
+				<span class="h6 muted black">
+					<%- date(item.date, "MMM D YYYY")%>
+				</span>
+			</a>
+			<% }) %>
+		</div>
+	<% }) %>
+	-->
+    <% for(year=posts.length-1;year>=0;--year) if(posts[year]) {%>
+      <div class="col-12 bg-white rounded mb4">
+        <span class="btn block border-bottom muted">
+          <%- year %> <span class="h6 muted">(<%- posts[year].length %>)</span>
+        </span>
+        <% var length=posts[year].length; sorted=posts[year].sort(function(a,b) { return a['date']> b['date']?-1:1;
+          });
+          sorted.forEach(function(item, index) { %>
+          <a href="<%- url_for(item.path) %>" class="btn block<%- (index != length - 1 ? ' border-bottom' : '') %>">
+            <%- item.title %>
+              <span class="h6 muted black">
+                <%- date(item.date, "MMM D YYYY" )%>
+              </span>
+          </a>
+          <% }) %>
+      </div>
+      <% } %>
+  </div>
+
+  <script src="<%= url_for('js/load.js') %>" type="text/javascript"></script>
+  <script src="<%= url_for('js/search.js') %>" type="text/javascript"></script>
